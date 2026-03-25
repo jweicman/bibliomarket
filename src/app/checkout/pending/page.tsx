@@ -1,6 +1,3 @@
-export const dynamic = 'force-dynamic'
-
-// src/app/checkout/pending/page.tsx
 'use client'
 import Link from 'next/link'
 import { Clock } from 'lucide-react'
@@ -17,7 +14,7 @@ export default function CheckoutPendingPage() {
           Tu pago está siendo procesado. Esto puede tardar unas horas (típicamente pagos en efectivo o transferencia).
         </p>
         <p className="text-sm text-ink-500 mb-8">
-          Te notificaremos por email cuando el pago sea confirmado y el vendedor pueda preparar el envío.
+          Te notificaremos por email cuando el pago sea confirmado.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link href="/dashboard/compras" className="btn-primary">Ver mis compras</Link>
