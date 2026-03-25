@@ -1,4 +1,3 @@
-// src/app/page.tsx
 import { Suspense } from 'react'
 import { Navbar } from '@/components/layout/navbar'
 import { Footer } from '@/components/layout/footer'
@@ -11,12 +10,21 @@ import { FeaturedPacks } from '@/components/home/featured-packs'
 import { prisma } from '@/lib/prisma'
 
 async function getHomeData() {
-  const [recentBooks, categories, stats] = await Promise.all([
+  const [recentBooks, categories, totalBooks, totalUsers, totalOrders] = await Promise.all([
     prisma.book.findMany({
       where: { status: 'ACTIVE' },
       include: {
         images: { orderBy: { order: 'asc' }, take: 1 },
-        seller: { select: { id: true, name: true, avatar: true, rating: true, city: true, province: true } },
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+            rating: true,
+            city: true,
+            province: true,
+          },
+        },
         category: true,
         _count: { select: { favorites: true } },
       },
@@ -24,17 +32,21 @@ async function getHomeData() {
       take: 12,
     }),
     prisma.category.findMany({
-      include: { _count: { select: { books: { where: { status: 'ACTIVE' } } } } },
+      include: {
+        _count: { select: { books: { where: { status: 'ACTIVE' } } } },
+      },
       orderBy: { name: 'asc' },
     }),
-    prisma.$transaction([
-      prisma.book.count({ where: { status: 'ACTIVE' } }),
-      prisma.user.count(),
-      prisma.order.count({ where: { status: 'DELIVERED' } }),
-    ]),
+    prisma.book.count({ where: { status: 'ACTIVE' } }),
+    prisma.user.count(),
+    prisma.order.count({ where: { status: 'DELIVERED' } }),
   ])
 
-  return { recentBooks, categories, stats }
+  return {
+    recentBooks,
+    categories,
+    stats: [totalBooks, totalUsers, totalOrders] as [number, number, number],
+  }
 }
 
 export default async function HomePage() {
@@ -47,7 +59,7 @@ export default async function HomePage() {
         <Hero stats={stats} />
         <CategoryGrid categories={categories} />
         <Suspense fallback={<div className="h-96 animate-pulse bg-paper-100" />}>
-          <RecentBooks books={recentBooks} />
+          <RecentBooks books={recentBooks as any} />
         </Suspense>
         <HowItWorks />
         <FeaturedPacks />
