@@ -1,12 +1,11 @@
-// prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ─── USERS ───────────────────────────────────────────────────────────────────
@@ -29,7 +28,6 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  // Address
   street        String?
   streetNumber  String?
   apartment     String?
@@ -38,12 +36,10 @@ model User {
   postalCode    String?
   country       String    @default("AR")
 
-  // Mercado Pago
   mpAccessToken  String?
   mpRefreshToken String?
   mpUserId       String?
 
-  // Relations
   accounts       Account[]
   sessions       Session[]
   listings       Book[]
@@ -109,29 +105,18 @@ model Book {
   price         Float
   originalPrice Float?
   currency      String      @default("ARS")
-  
   condition     BookCondition
-  category      Category    @relation(fields: [categoryId], references: [id])
   categoryId    String
-  
+  category      Category    @relation(fields: [categoryId], references: [id])
   images        BookImage[]
-  
   sellerId      String
   seller        User        @relation(fields: [sellerId], references: [id])
-  
   status        BookStatus  @default(ACTIVE)
-  
-  // Shipping
   shippingModes ShippingMode[]
   shippingCost  Float?
-  
-  // Stats
   views         Int         @default(0)
-  
-  // Location (inherited from user but can override)
   city          String?
   province      String?
-  
   publishedAt   DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
@@ -144,7 +129,7 @@ model Book {
 model BookImage {
   id        String   @id @default(cuid())
   url       String
-  publicId  String?  // Cloudinary public ID
+  publicId  String?
   order     Int      @default(0)
   bookId    String
   book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
@@ -153,12 +138,12 @@ model BookImage {
 }
 
 model Category {
-  id       String @id @default(cuid())
-  name     String @unique
-  slug     String @unique
-  icon     String?
-  color    String?
-  books    Book[]
+  id    String @id @default(cuid())
+  name  String @unique
+  slug  String @unique
+  icon  String?
+  color String?
+  books Book[]
 
   @@map("categories")
 }
@@ -166,57 +151,42 @@ model Category {
 // ─── ORDERS ──────────────────────────────────────────────────────────────────
 
 model Order {
-  id              String      @id @default(cuid())
-  orderNumber     String      @unique @default(cuid())
-  
+  id              String        @id @default(cuid())
+  orderNumber     String        @unique @default(cuid())
   bookId          String
-  book            Book        @relation(fields: [bookId], references: [id])
-  
+  book            Book          @relation(fields: [bookId], references: [id])
   buyerId         String
-  buyer           User        @relation("Buyer", fields: [buyerId], references: [id])
-  
+  buyer           User          @relation("Buyer", fields: [buyerId], references: [id])
   sellerId        String
-  seller          User        @relation("Seller", fields: [sellerId], references: [id])
-  
-  status          OrderStatus @default(PENDING)
-  
-  // Pricing
+  seller          User          @relation("Seller", fields: [sellerId], references: [id])
+  status          OrderStatus   @default(PENDING)
   bookPrice       Float
-  shippingCost    Float       @default(0)
-  platformFee     Float       @default(0)
+  shippingCost    Float         @default(0)
+  platformFee     Float         @default(0)
   total           Float
-  currency        String      @default("ARS")
-  
-  // Payment
+  currency        String        @default("ARS")
   paymentMethod   PaymentMethod?
-  paymentId       String?     // MercadoPago payment ID
+  paymentId       String?
   paymentStatus   PaymentStatus @default(PENDING)
   paidAt          DateTime?
-  
-  // Shipping
   shippingMode    ShippingMode?
   trackingNumber  String?
-  shippingLabel   String?     // URL to label PDF
-  shippingAddress Json?       // Snapshot of address at time of purchase
+  shippingLabel   String?
+  shippingAddress Json?
   estimatedDelivery DateTime?
   shippedAt       DateTime?
   deliveredAt     DateTime?
-  
-  // OCA specific
   ocaGuideNumber  String?
   ocaBranchOrigin String?
   ocaBranchDest   String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  
   review          Review?
   notifications   Notification[]
 
   @@map("orders")
 }
-
-// ─── REVIEWS ─────────────────────────────────────────────────────────────────
 
 model Review {
   id          String   @id @default(cuid())
@@ -226,14 +196,12 @@ model Review {
   reviewer    User     @relation("Reviewer", fields: [reviewerId], references: [id])
   reviewedId  String
   reviewed    User     @relation("Reviewed", fields: [reviewedId], references: [id])
-  rating      Int      // 1-5
+  rating      Int
   comment     String?
   createdAt   DateTime @default(now())
 
   @@map("reviews")
 }
-
-// ─── FAVORITES ───────────────────────────────────────────────────────────────
 
 model Favorite {
   id        String   @id @default(cuid())
@@ -247,13 +215,11 @@ model Favorite {
   @@map("favorites")
 }
 
-// ─── MESSAGING ───────────────────────────────────────────────────────────────
-
 model Conversation {
   id           String   @id @default(cuid())
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  
+
   participants ConversationParticipant[]
   messages     Message[]
 }
@@ -281,8 +247,6 @@ model Message {
 
   @@map("messages")
 }
-
-// ─── NOTIFICATIONS ────────────────────────────────────────────────────────────
 
 model Notification {
   id        String           @id @default(cuid())
