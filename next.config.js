@@ -7,13 +7,14 @@ const nextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
   },
-  // Ignore TS and ESLint errors during build so deploy doesn't fail
   typescript: {
     ignoreBuildErrors: true,
   },
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Exclude Prisma from being bundled on the edge
+  serverExternalPackages: ['@prisma/client', 'prisma'],
   compress: true,
   poweredByHeader: false,
 }

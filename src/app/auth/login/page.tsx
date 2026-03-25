@@ -1,6 +1,5 @@
 // src/app/auth/login/page.tsx
 'use client'
-
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -8,19 +7,16 @@ import { signIn } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { BookOpen, Eye, EyeOff, Loader2 } from 'lucide-react'
-
 export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirect = searchParams.get('redirect') || '/dashboard'
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-
   const { register, handleSubmit, formState: { errors } } = useForm<{
     email: string
     password: string
   }>()
-
   const onSubmit = async (data: { email: string; password: string }) => {
     setLoading(true)
     try {
@@ -29,7 +25,6 @@ export default function LoginPage() {
         password: data.password,
         redirect: false,
       })
-
       if (result?.error) {
         toast.error(result.error)
       } else {
@@ -41,7 +36,6 @@ export default function LoginPage() {
       setLoading(false)
     }
   }
-
   return (
     <div className="min-h-screen bg-paper-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
@@ -53,7 +47,6 @@ export default function LoginPage() {
             Biblio<span className="text-forest-600">Market</span>
           </span>
         </Link>
-
         <div className="bg-white rounded-2xl border border-paper-200 shadow-card p-8">
           <h1 className="font-display text-2xl font-bold text-ink-900 mb-1">Iniciar sesión</h1>
           <p className="text-ink-500 text-sm mb-6">
@@ -62,7 +55,6 @@ export default function LoginPage() {
               Registrate gratis
             </Link>
           </p>
-
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-ink-700 mb-1.5">Email</label>
@@ -75,7 +67,6 @@ export default function LoginPage() {
               />
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
             </div>
-
             <div>
               <div className="flex justify-between mb-1.5">
                 <label className="text-sm font-semibold text-ink-700">Contraseña</label>
@@ -101,7 +92,6 @@ export default function LoginPage() {
               </div>
               {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
             </div>
-
             <button
               type="submit"
               disabled={loading}
@@ -114,7 +104,6 @@ export default function LoginPage() {
               )}
             </button>
           </form>
-
           <div className="mt-4 relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-paper-200" />
@@ -123,7 +112,6 @@ export default function LoginPage() {
               <span className="bg-white px-3 text-ink-400">o ingresá con</span>
             </div>
           </div>
-
           <button
             onClick={() => signIn('google', { callbackUrl: redirect })}
             className="mt-4 w-full btn-secondary justify-center"

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 // src/app/dashboard/favoritos/page.tsx
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'

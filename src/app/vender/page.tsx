@@ -1,6 +1,5 @@
 // src/app/vender/page.tsx
 'use client'
-
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
@@ -14,7 +13,6 @@ import {
   Upload, X, Plus, BookOpen, DollarSign,
   Truck, Info, ChevronRight, Loader2
 } from 'lucide-react'
-
 const bookSchema = z.object({
   title: z.string().min(2, 'El título es muy corto').max(200),
   author: z.string().min(2, 'El autor es muy corto').max(200),
@@ -27,9 +25,7 @@ const bookSchema = z.object({
   shippingModes: z.array(z.string()).min(1, 'Seleccioná al menos una opción de entrega'),
   shippingCost: z.number().min(0).optional(),
 })
-
 type BookFormData = z.infer<typeof bookSchema>
-
 const CONDITIONS = [
   { value: 'NEW', label: 'Nuevo', desc: 'Sin uso, en perfectas condiciones' },
   { value: 'LIKE_NEW', label: 'Como nuevo', desc: 'Muy poco uso, sin marcas' },
@@ -37,7 +33,6 @@ const CONDITIONS = [
   { value: 'FAIR', label: 'Regular', desc: 'Uso intenso, pero legible' },
   { value: 'POOR', label: 'Deteriorado', desc: 'Daños visibles, aún funcional' },
 ]
-
 const SHIPPING_OPTIONS = [
   { value: 'OCA_E_PAK', label: 'OCA e-Pak (puerta a puerta)', desc: 'El comprador recibe en su domicilio' },
   { value: 'OCA_SUCURSAL', label: 'OCA a sucursal', desc: 'El comprador retira en sucursal OCA' },
@@ -45,7 +40,6 @@ const SHIPPING_OPTIONS = [
   { value: 'PERSONAL_DELIVERY', label: 'Entrega personal', desc: 'Coordinás con el comprador' },
   { value: 'MEET_IN_PERSON', label: 'Encuentro en persona', desc: 'Se encuentran en un punto acordado' },
 ]
-
 export default function SellPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
@@ -54,7 +48,6 @@ export default function SellPage() {
   const [uploading, setUploading] = useState(false)
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([])
   const [step, setStep] = useState(1)
-
   const {
     register,
     handleSubmit,
@@ -65,37 +58,30 @@ export default function SellPage() {
     resolver: zodResolver(bookSchema),
     defaultValues: { shippingModes: [], condition: 'GOOD' },
   })
-
   const watchedShippingModes = watch('shippingModes')
   const watchedCondition = watch('condition')
-
   // Redirect if not logged in
   if (status === 'unauthenticated') {
     router.push('/auth/login?redirect=/vender')
     return null
   }
-
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
     if (images.length + files.length > 8) {
       toast.error('Máximo 8 fotos por publicación')
       return
     }
-
     const newImages = [...images, ...files]
     setImages(newImages)
-
     const newPreviews = files.map((f) => URL.createObjectURL(f))
     setImagePreviews([...imagePreviews, ...newPreviews])
   }
-
   const removeImage = (index: number) => {
     const newImages = images.filter((_, i) => i !== index)
     const newPreviews = imagePreviews.filter((_, i) => i !== index)
     setImages(newImages)
     setImagePreviews(newPreviews)
   }
-
   const toggleShipping = (value: string) => {
     const current = watchedShippingModes
     if (current.includes(value)) {
@@ -104,13 +90,11 @@ export default function SellPage() {
       setValue('shippingModes', [...current, value])
     }
   }
-
   const onSubmit = async (data: BookFormData) => {
     if (images.length === 0) {
       toast.error('Agregá al menos una foto del libro')
       return
     }
-
     setUploading(true)
     try {
       // 1. Upload images to Cloudinary
@@ -122,16 +106,13 @@ export default function SellPage() {
         const { url } = await res.json()
         uploadedUrls.push(url)
       }
-
       // 2. Create book listing
       const res = await fetch('/api/books', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...data, images: uploadedUrls }),
       })
-
       if (!res.ok) throw new Error('Error al publicar')
-
       const { book } = await res.json()
       toast.success('¡Libro publicado exitosamente!')
       router.push(`/libros/${book.id}`)
@@ -141,7 +122,6 @@ export default function SellPage() {
       setUploading(false)
     }
   }
-
   return (
     <>
       <Navbar />
@@ -155,7 +135,6 @@ export default function SellPage() {
             Completá los datos y empezá a vender. La publicación es gratis.
           </p>
         </div>
-
         {/* Progress steps */}
         <div className="flex items-center gap-2 mb-8">
           {['Fotos', 'Datos del libro', 'Precio y envío'].map((label, i) => (
@@ -176,7 +155,6 @@ export default function SellPage() {
             </div>
           ))}
         </div>
-
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {/* Step 1: Photos */}
           <div className="bg-white rounded-2xl border border-paper-200 p-6">
@@ -186,7 +164,6 @@ export default function SellPage() {
               </div>
               <h2 className="text-lg font-display font-bold text-ink-800">Fotos del libro</h2>
             </div>
-
             <div className="grid grid-cols-4 gap-3">
               {imagePreviews.map((preview, i) => (
                 <div key={i} className="relative aspect-square">
@@ -203,7 +180,6 @@ export default function SellPage() {
                   )}
                 </div>
               ))}
-
               {images.length < 8 && (
                 <label className="aspect-square border-2 border-dashed border-paper-300 rounded-lg flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-forest-400 hover:bg-forest-50 transition-colors">
                   <Plus className="w-6 h-6 text-ink-400" />
@@ -212,13 +188,11 @@ export default function SellPage() {
                 </label>
               )}
             </div>
-
             <p className="text-xs text-ink-500 mt-3 flex items-center gap-1">
               <Info className="w-3 h-3" />
               Agregá hasta 8 fotos. La primera será la foto principal.
             </p>
           </div>
-
           {/* Step 2: Book data */}
           <div className="bg-white rounded-2xl border border-paper-200 p-6">
             <div className="flex items-center gap-3 mb-5">
@@ -227,7 +201,6 @@ export default function SellPage() {
               </div>
               <h2 className="text-lg font-display font-bold text-ink-800">Datos del libro</h2>
             </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
                 <label className="block text-sm font-semibold text-ink-700 mb-1.5">
@@ -236,7 +209,6 @@ export default function SellPage() {
                 <input {...register('title')} className="input-field" placeholder="Ej: El Aleph" />
                 {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title.message}</p>}
               </div>
-
               <div>
                 <label className="block text-sm font-semibold text-ink-700 mb-1.5">
                   Autor <span className="text-red-500">*</span>
@@ -244,12 +216,10 @@ export default function SellPage() {
                 <input {...register('author')} className="input-field" placeholder="Ej: Jorge Luis Borges" />
                 {errors.author && <p className="text-red-500 text-xs mt-1">{errors.author.message}</p>}
               </div>
-
               <div>
                 <label className="block text-sm font-semibold text-ink-700 mb-1.5">ISBN</label>
                 <input {...register('isbn')} className="input-field" placeholder="978-..." />
               </div>
-
               <div className="sm:col-span-2">
                 <label className="block text-sm font-semibold text-ink-700 mb-1.5">Descripción</label>
                 <textarea
@@ -259,7 +229,6 @@ export default function SellPage() {
                   placeholder="Contá el estado del libro, si tiene subrayados, si le faltan páginas, etc."
                 />
               </div>
-
               {/* Condition */}
               <div className="sm:col-span-2">
                 <label className="block text-sm font-semibold text-ink-700 mb-2">
@@ -286,7 +255,6 @@ export default function SellPage() {
               </div>
             </div>
           </div>
-
           {/* Step 3: Price and shipping */}
           <div className="bg-white rounded-2xl border border-paper-200 p-6">
             <div className="flex items-center gap-3 mb-5">
@@ -295,7 +263,6 @@ export default function SellPage() {
               </div>
               <h2 className="text-lg font-display font-bold text-ink-800">Precio y envío</h2>
             </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               <div>
                 <label className="block text-sm font-semibold text-ink-700 mb-1.5">
@@ -312,7 +279,6 @@ export default function SellPage() {
                 </div>
                 {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price.message}</p>}
               </div>
-
               <div>
                 <label className="block text-sm font-semibold text-ink-700 mb-1.5">
                   Precio original (opcional)
@@ -328,7 +294,6 @@ export default function SellPage() {
                 </div>
               </div>
             </div>
-
             {/* Shipping */}
             <div>
               <label className="block text-sm font-semibold text-ink-700 mb-2 flex items-center gap-2">
@@ -369,7 +334,6 @@ export default function SellPage() {
                 <p className="text-red-500 text-xs mt-1">{errors.shippingModes.message}</p>
               )}
             </div>
-
             {/* Platform fee notice */}
             <div className="mt-6 p-4 bg-paper-100 rounded-xl flex gap-3">
               <Info className="w-5 h-5 text-ink-500 shrink-0 mt-0.5" />
@@ -382,7 +346,6 @@ export default function SellPage() {
               </div>
             </div>
           </div>
-
           {/* Submit */}
           <div className="flex gap-3 pb-10">
             <button

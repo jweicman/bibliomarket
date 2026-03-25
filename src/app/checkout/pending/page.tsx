@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 // src/app/checkout/pending/page.tsx
 'use client'
 import Link from 'next/link'

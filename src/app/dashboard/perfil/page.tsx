@@ -1,6 +1,5 @@
 // src/app/dashboard/perfil/page.tsx
 'use client'
-
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
@@ -9,7 +8,6 @@ import toast from 'react-hot-toast'
 import { Navbar } from '@/components/layout/navbar'
 import { Footer } from '@/components/layout/footer'
 import { User, MapPin, Phone, Lock, Loader2, Save } from 'lucide-react'
-
 const PROVINCES = [
   'Buenos Aires', 'CABA', 'Córdoba', 'Santa Fe', 'Mendoza',
   'Tucumán', 'Entre Ríos', 'Salta', 'Misiones', 'Chaco',
@@ -17,15 +15,12 @@ const PROVINCES = [
   'Neuquén', 'Formosa', 'Chubut', 'San Luis', 'Catamarca',
   'La Rioja', 'La Pampa', 'Santa Cruz', 'Corrientes', 'Tierra del Fuego',
 ]
-
 export default function ProfilePage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-
   const { register, handleSubmit, reset, formState: { errors, isDirty } } = useForm<any>()
-
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/auth/login')
     if (status === 'authenticated') {
@@ -34,7 +29,6 @@ export default function ProfilePage() {
         .then(({ user }) => { reset(user); setLoading(false) })
     }
   }, [status])
-
   const onSubmit = async (data: any) => {
     setSaving(true)
     try {
@@ -53,7 +47,6 @@ export default function ProfilePage() {
       setSaving(false)
     }
   }
-
   if (loading) return (
     <>
       <Navbar />
@@ -62,13 +55,11 @@ export default function ProfilePage() {
       </div>
     </>
   )
-
   return (
     <>
       <Navbar />
       <main className="container-main py-8 max-w-2xl">
         <h1 className="font-display text-3xl font-bold text-ink-900 mb-6">Mi perfil</h1>
-
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Personal data */}
           <div className="bg-white rounded-2xl border border-paper-200 p-6">
@@ -99,7 +90,6 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-
           {/* Address */}
           <div className="bg-white rounded-2xl border border-paper-200 p-6">
             <div className="flex items-center gap-2 mb-4">
@@ -139,7 +129,6 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-
           {/* Save button */}
           <button
             type="submit"

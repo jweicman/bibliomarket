@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 // src/app/api/shipping/oca-rate/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { getOCARate } from '@/lib/oca'

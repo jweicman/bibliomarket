@@ -1,6 +1,5 @@
 // src/app/auth/register/page.tsx
 'use client'
-
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -10,7 +9,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import toast from 'react-hot-toast'
 import { BookOpen, Eye, EyeOff, Loader2, Check } from 'lucide-react'
-
 const schema = z.object({
   name: z.string().min(2, 'Mínimo 2 caracteres').max(100),
   email: z.string().email('Email inválido'),
@@ -22,27 +20,22 @@ const schema = z.object({
   phone: z.string().optional(),
   terms: z.boolean().refine((v) => v === true, 'Debés aceptar los términos'),
 })
-
 type FormData = z.infer<typeof schema>
-
 export default function RegisterPage() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
-
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({ resolver: zodResolver(schema) })
-
   const password = watch('password', '')
   const checks = {
     length: password.length >= 8,
     uppercase: /[A-Z]/.test(password),
     number: /[0-9]/.test(password),
   }
-
   const onSubmit = async (data: FormData) => {
     try {
       const res = await fetch('/api/auth/register', {
@@ -50,28 +43,23 @@ export default function RegisterPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       })
-
       if (!res.ok) {
         const err = await res.json()
         toast.error(err.error || 'Error al registrarse')
         return
       }
-
       toast.success('¡Cuenta creada exitosamente!')
-
       // Auto login
       await signIn('credentials', {
         email: data.email,
         password: data.password,
         redirect: false,
       })
-
       router.push('/dashboard')
     } catch {
       toast.error('Error al crear la cuenta')
     }
   }
-
   return (
     <div className="min-h-screen bg-paper-50 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
@@ -84,7 +72,6 @@ export default function RegisterPage() {
             Biblio<span className="text-forest-600">Market</span>
           </span>
         </Link>
-
         <div className="bg-white rounded-2xl border border-paper-200 shadow-card p-8">
           <h1 className="font-display text-2xl font-bold text-ink-900 mb-1">Crear cuenta</h1>
           <p className="text-ink-500 text-sm mb-6">
@@ -93,7 +80,6 @@ export default function RegisterPage() {
               Ingresá
             </Link>
           </p>
-
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-ink-700 mb-1.5">
@@ -107,7 +93,6 @@ export default function RegisterPage() {
               />
               {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
             </div>
-
             <div>
               <label className="block text-sm font-semibold text-ink-700 mb-1.5">Email</label>
               <input
@@ -119,7 +104,6 @@ export default function RegisterPage() {
               />
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
             </div>
-
             <div>
               <label className="block text-sm font-semibold text-ink-700 mb-1.5">Teléfono (opcional)</label>
               <input
@@ -130,7 +114,6 @@ export default function RegisterPage() {
                 autoComplete="tel"
               />
             </div>
-
             <div>
               <label className="block text-sm font-semibold text-ink-700 mb-1.5">Contraseña</label>
               <div className="relative">
@@ -149,7 +132,6 @@ export default function RegisterPage() {
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-
               {/* Password strength */}
               {password && (
                 <div className="mt-2 space-y-1">
@@ -169,7 +151,6 @@ export default function RegisterPage() {
               )}
               {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
             </div>
-
             <div className="flex items-start gap-2">
               <input
                 {...register('terms')}
@@ -189,7 +170,6 @@ export default function RegisterPage() {
               </label>
             </div>
             {errors.terms && <p className="text-red-500 text-xs">{errors.terms.message}</p>}
-
             <button
               type="submit"
               disabled={isSubmitting}
@@ -205,7 +185,6 @@ export default function RegisterPage() {
               )}
             </button>
           </form>
-
           <div className="mt-4 relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-paper-200" />
@@ -214,7 +193,6 @@ export default function RegisterPage() {
               <span className="bg-white px-3 text-ink-400">o registrate con</span>
             </div>
           </div>
-
           <button
             onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
             className="mt-4 w-full btn-secondary justify-center"

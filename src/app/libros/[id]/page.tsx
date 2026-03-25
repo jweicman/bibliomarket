@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 // src/app/libros/[id]/page.tsx
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'

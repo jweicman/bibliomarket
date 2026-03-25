@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 // src/app/layout.tsx
 import type { Metadata } from 'next'
 import { Playfair_Display, Inter, JetBrains_Mono } from 'next/font/google'

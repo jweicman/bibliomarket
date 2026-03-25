@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 // src/app/vender/editar/[id]/page.tsx
 import { getServerSession } from 'next-auth'
 import { redirect, notFound } from 'next/navigation'
